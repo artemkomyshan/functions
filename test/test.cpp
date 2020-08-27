@@ -10,6 +10,7 @@
 
 #include "call_once_silent.cpp"
 #include "shared_function.cpp"
+#include "call_on_expire.cpp"
 
 int
 main ()

@@ -9,6 +9,8 @@
 #include <functional>
 #include <memory>
 
+#include "requires.hpp"
+
 /**
  * @brief The call_on_expire struct wraps function into shared_ptr and invokes
  * this function before deletion. In other words, the bound function is invoked
@@ -20,20 +22,28 @@ namespace ak
 
 class call_on_expire
 {
-  using tCall = std::function<void (void)>;
+  using call_t = std::function<void (void)>;
 
 public:
-  template <typename Func>
-  call_on_expire (Func call)
-      : mCall (new tCall (std::move (call)), [] (tCall *call) {
-          (*call) ();
-          delete call;
+  template <typename Func, typename = Requires<Not<std::is_same<typename std::decay<Func>::type, call_on_expire> > > >
+  call_on_expire (Func &&action)
+      : action_ (new call_t (std::forward<Func> (action)), [] (call_t *action) {
+          (*action) ();
+          delete action;
         })
   {
   }
 
+  call_on_expire () = default;
+
+  void
+  release ()
+  {
+    action_.reset ();
+  }
+
 private:
-  std::shared_ptr<tCall> mCall;
+  std::shared_ptr<call_t> action_;
 };
 
 } // namespace ak
