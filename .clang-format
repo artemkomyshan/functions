@@ -1,5 +1,14 @@
-﻿---
-BasedOnStyle: GNU
-ColumnLimit: '120'
+﻿BasedOnStyle: LLVM
 
-...
+PointerAlignment: Left
+AllowAllArgumentsOnNextLine: true
+AllowShortFunctionsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Empty
+AlwaysBreakTemplateDeclarations: Yes
+AllowShortLambdasOnASingleLine: Inline
+FixNamespaceComments: true
+BreakBeforeBraces: GNU
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+ConstructorInitializerAllOnOneLineOrOnePerLine: true

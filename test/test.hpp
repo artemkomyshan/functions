@@ -12,24 +12,23 @@
 #include <string>
 #include <unordered_map>
 
-std::unordered_map<std::string, std::function<void ()> > tests;
+std::unordered_map<std::string, std::function<void()>> tests;
 
 struct test_t
 {
-  test_t (std::string _name) : name (_name) {}
+  test_t(std::string _name) : name(_name) {}
 
   std::string name;
 
   template <typename Func>
-  test_t &
-  operator<< (Func &&func)
+  test_t& operator<<(Func&& func)
   {
-    tests.emplace (name, std::forward<Func> (func));
+    tests.emplace(name, std::forward<Func>(func));
     return *this;
   }
 };
 
 #define STRINGIFY_(x) #x
-#define STRINGIFY(x) STRINGIFY_ (x)
+#define STRINGIFY(x) STRINGIFY_(x)
 
-#define TEST(NAME) auto NAME = test_t{ STRINGIFY (NAME) } << []
+#define TEST(NAME) auto NAME = test_t{STRINGIFY(NAME)} << []

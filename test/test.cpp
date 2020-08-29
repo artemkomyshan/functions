@@ -8,20 +8,20 @@
 
 #include <iostream>
 
+#include "call_on_expire.cpp"
 #include "call_once_silent.cpp"
 #include "shared_function.cpp"
-#include "call_on_expire.cpp"
+#include "not_empty_function.cpp"
 
-int
-main ()
+int main()
 {
-  std::cout << "TEST number: " << tests.size () << std::endl;
+  std::cout << "TEST number: " << tests.size() << std::endl;
   auto count = 0u;
-  for (auto &test : tests)
+  for (auto& test : tests)
     {
       std::cout << count << " " << test.first << std::endl;
       ++count;
-      test.second ();
+      test.second();
     }
 
   return 0;

@@ -10,7 +10,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "requires.hpp"
+#include "ak/callable_type_traits.hpp"
+#include "ak/requires.hpp"
 
 /**
  * @brief The call_once_silent class is std::function wrapper which allows this
@@ -21,92 +22,94 @@
 namespace ak
 {
 
-template <typename... Args> class call_once_silent
+template <typename... Args>
+class call_once_silent
 {
-  template <typename From, typename To>
-  using check_func_return_type = Or<std::is_void<To>, std::is_same<From, To>, std::is_convertible<From, To> >;
-
-  template <typename Func, typename Ret2 = typename std::result_of<Func &(Args...)>::type>
+  template <typename Func,
+            typename Ret2 = typename std::result_of<Func&(Args...)>::type>
   struct Callable : check_func_return_type<Ret2, void>
   {
   };
 
 public:
-  template <typename Func, typename = Requires<Not<std::is_same<typename std::decay<Func>::type, call_once_silent> > >,
-            typename = Requires<Callable<Func> > >
-  call_once_silent (Func &&func) : mFunc (std::forward<Func> (func))
+  template <
+      typename Func,
+      typename = Requires<
+          Not<std::is_same<typename std::decay<Func>::type, call_once_silent>>>,
+      typename = Requires<Callable<Func>>>
+  call_once_silent(Func&& func) : mFunc(std::forward<Func>(func))
   {
   }
 
-  call_once_silent () noexcept : mFunc (nullptr) {}
+  call_once_silent() noexcept : mFunc(nullptr) {}
 
-  call_once_silent (std::nullptr_t) noexcept : mFunc (nullptr) {}
+  call_once_silent(std::nullptr_t) noexcept : mFunc(nullptr) {}
 
-  call_once_silent (call_once_silent const &o) = delete;
-  call_once_silent &operator= (call_once_silent const &o) = delete;
+  call_once_silent(call_once_silent const& o) = delete;
+  call_once_silent& operator=(call_once_silent const& o) = delete;
 
-  call_once_silent (call_once_silent &&o) = default;
-  call_once_silent &operator= (call_once_silent &&o) = default;
+  call_once_silent(call_once_silent&& o) = default;
+  call_once_silent& operator=(call_once_silent&& o) = default;
 
-  template <typename Func, typename = Requires<Not<std::is_same<typename std::decay<Func>::type, call_once_silent> > >,
-            typename = Requires<Callable<Func> > >
-  call_once_silent &
-  operator= (Func &&func)
+  template <
+      typename Func,
+      typename = Requires<
+          Not<std::is_same<typename std::decay<Func>::type, call_once_silent>>>,
+      typename = Requires<Callable<Func>>>
+  call_once_silent& operator=(Func&& func)
   {
-    mFunc = std::forward<Func> (func);
+    mFunc = std::forward<Func>(func);
     return *this;
   }
 
-  call_once_silent &operator= (std::nullptr_t) noexcept
+  call_once_silent& operator=(std::nullptr_t) noexcept
   {
     mFunc = nullptr;
     return *this;
   }
 
-  void
-  operator() (Args... args)
+  void operator()(Args... args)
   {
     if (!mFunc)
       return;
 
-    auto func = std::move (mFunc);
+    auto func = std::move(mFunc);
     mFunc = nullptr;
 
-    func (std::forward<Args> (args)...);
+    func(std::forward<Args>(args)...);
   }
 
-  explicit operator bool () const { return mFunc != nullptr; }
+  explicit operator bool() const
+  {
+    return mFunc != nullptr;
+  }
 
 private:
-  std::function<void (Args...)> mFunc;
+  std::function<void(Args...)> mFunc;
 };
 
 // null pointer comparisons
 template <typename... Args>
-bool
-operator== (call_once_silent<Args...> const &call, std::nullptr_t) noexcept
+bool operator==(call_once_silent<Args...> const& call, std::nullptr_t) noexcept
 {
-  return !static_cast<bool> (call);
+  return !static_cast<bool>(call);
 }
 
 template <typename... Args>
-bool
-operator== (std::nullptr_t, call_once_silent<Args...> const &call) noexcept
+bool operator==(std::nullptr_t, call_once_silent<Args...> const& call) noexcept
 {
-  return !static_cast<bool> (call);
+  return !static_cast<bool>(call);
 }
 
 template <typename... Args>
-bool
-operator!= (call_once_silent<Args...> const &call, std::nullptr_t) noexcept
+bool operator!=(call_once_silent<Args...> const& call, std::nullptr_t) noexcept
 {
-  return static_cast<bool> (call);
+  return static_cast<bool>(call);
 }
 template <typename... Args>
-bool
-operator!= (std::nullptr_t, call_once_silent<Args...> const &call) noexcept
+bool operator!=(std::nullptr_t, call_once_silent<Args...> const& call) noexcept
 {
-  return static_cast<bool> (call);
+  return static_cast<bool>(call);
 }
 
 } // namespace ak

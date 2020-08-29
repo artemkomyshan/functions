@@ -10,38 +10,42 @@
 
 using namespace ak;
 
-TEST (call_on_expire_local)
+TEST(call_on_expire_local)
 {
   auto called = false;
 
   {
-    call_on_expire coe{ [&called] () mutable { called = true; } };
-    assert (!called);
+    call_on_expire coe{[&called]() mutable {
+      called = true;
+    }};
+    assert(!called);
 
     call_on_expire ocoe = coe;
-    assert (!called);
+    assert(!called);
   }
 
-  assert (called);
+  assert(called);
 };
 
-TEST (call_on_expire_release)
+TEST(call_on_expire_release)
 {
   auto called = false;
 
   call_on_expire coe;
 
   {
-    call_on_expire lcoe{ [&called] () mutable { called = true; } };
-    assert (!called);
+    call_on_expire lcoe{[&called]() mutable {
+      called = true;
+    }};
+    assert(!called);
 
     coe = lcoe;
-    assert (!called);
+    assert(!called);
   }
 
-  assert (!called);
+  assert(!called);
 
-  coe.release ();
+  coe.release();
 
-  assert (called);
+  assert(called);
 };

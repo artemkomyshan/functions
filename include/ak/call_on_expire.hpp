@@ -9,7 +9,7 @@
 #include <functional>
 #include <memory>
 
-#include "requires.hpp"
+#include "ak/requires.hpp"
 
 /**
  * @brief The call_on_expire struct wraps function into shared_ptr and invokes
@@ -22,24 +22,25 @@ namespace ak
 
 class call_on_expire
 {
-  using call_t = std::function<void (void)>;
+  using call_t = std::function<void(void)>;
 
 public:
-  template <typename Func, typename = Requires<Not<std::is_same<typename std::decay<Func>::type, call_on_expire> > > >
-  call_on_expire (Func &&action)
-      : action_ (new call_t (std::forward<Func> (action)), [] (call_t *action) {
-          (*action) ();
-          delete action;
-        })
+  template <typename Func,
+            typename = Requires<Not<
+                std::is_same<typename std::decay<Func>::type, call_on_expire>>>>
+  call_on_expire(Func&& action)
+      : action_(new call_t(std::forward<Func>(action)), [](call_t* action) {
+        (*action)();
+        delete action;
+      })
   {
   }
 
-  call_on_expire () = default;
+  call_on_expire() = default;
 
-  void
-  release ()
+  void release()
   {
-    action_.reset ();
+    action_.reset();
   }
 
 private:
