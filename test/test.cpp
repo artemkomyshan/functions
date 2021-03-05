@@ -10,8 +10,9 @@
 
 #include "call_on_expire.cpp"
 #include "call_once_silent.cpp"
-#include "shared_function.cpp"
+#include "callback_guardian.cpp"
 #include "not_empty_function.cpp"
+#include "shared_function.cpp"
 
 int main()
 {
