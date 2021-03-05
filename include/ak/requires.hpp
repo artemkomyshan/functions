@@ -19,21 +19,21 @@ struct Or<> : public std::false_type
 {
 };
 
-template <typename _Cond1>
-struct Or<_Cond1> : public _Cond1
+template <typename Cond1>
+struct Or<Cond1> : public Cond1
 {
 };
 
-template <typename _Cond1, typename _Cond2>
-struct Or<_Cond1, _Cond2>
-    : public std::conditional<_Cond1::value, _Cond1, _Cond2>::type
+template <typename Cond1, typename Cond2>
+struct Or<Cond1, Cond2>
+    : public std::conditional<Cond1::value, Cond1, Cond2>::type
 {
 };
 
-template <typename _Cond1, typename _Cond2, typename _Cond3, typename... _Condn>
-struct Or<_Cond1, _Cond2, _Cond3, _Condn...>
-    : public std::conditional<_Cond1::value, _Cond1,
-                              Or<_Cond2, _Cond3, _Condn...>>::type
+template <typename Cond1, typename Cond2, typename Cond3, typename... CondN>
+struct Or<Cond1, Cond2, Cond3, CondN...>
+    : public std::conditional<Cond1::value, Cond1,
+                              Or<Cond2, Cond3, CondN...>>::type
 {
 };
 
@@ -45,30 +45,30 @@ struct And<> : public std::true_type
 {
 };
 
-template <typename _Cond1>
-struct And<_Cond1> : public _Cond1
+template <typename Cond1>
+struct And<Cond1> : public Cond1
 {
 };
 
-template <typename _Cond1, typename _Cond2>
-struct And<_Cond1, _Cond2>
-    : public std::conditional<_Cond1::value, _Cond2, _Cond1>::type
+template <typename Cond1, typename Cond2>
+struct And<Cond1, Cond2>
+    : public std::conditional<Cond1::value, Cond2, Cond1>::type
 {
 };
 
-template <typename _Cond1, typename _Cond2, typename _Cond3, typename... _Condn>
-struct And<_Cond1, _Cond2, _Cond3, _Condn...>
-    : public std::conditional<_Cond1::value, And<_Cond2, _Cond3, _Condn...>,
-                              _Cond1>::type
+template <typename Cond1, typename Cond2, typename Cond3, typename... CondN>
+struct And<Cond1, Cond2, Cond3, CondN...>
+    : public std::conditional<Cond1::value, And<Cond2, Cond3, CondN...>,
+                              Cond1>::type
 {
 };
 
-template <typename _Cond>
-struct Not : public std::integral_constant<bool, !_Cond::value>
+template <typename Cond>
+struct Not : public std::integral_constant<bool, !Cond::value>
 {
 };
 
-template <typename _Cond, typename Ret = void>
-using Requires = typename std::enable_if<_Cond::value, Ret>::type;
+template <typename Cond, typename Ret = void>
+using Requires = typename std::enable_if<Cond::value, Ret>::type;
 
 } // namespace ak
