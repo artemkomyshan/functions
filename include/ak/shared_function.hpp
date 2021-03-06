@@ -22,17 +22,19 @@
 namespace ak
 {
 
-template <typename Func>
-class shared_function
+template <typename Signature>
+class shared_function;
+
+template <typename Ret, typename... Args>
+class shared_function<Ret(Args...)>
 {
 public:
   explicit operator bool() const;
 
-  template <typename... Args>
-  std::result_of_t<Func(Args...)> operator()(Args... args) const;
+  Ret operator()(Args... args) const;
 
-  Func const& get() const;
-  Func& get();
+  std::function<Ret(Args...)> const& get() const;
+  std::function<Ret(Args...)>& get();
 
   shared_function() = default;
   shared_function(std::nullptr_t);
@@ -61,52 +63,49 @@ public:
   void swap(shared_function& other);
 
 private:
-  std::shared_ptr<Func> mCall;
+  std::shared_ptr<std::function<Ret(Args...)>> mCall;
 };
 
-template <typename Func>
-shared_function<Func> make_shared_function(Func f)
-{
-  return shared_function<Func>(std::move(f));
-}
-
-template <typename Func>
-shared_function<Func>::shared_function(std::nullptr_t) : shared_function()
+template <typename Ret, typename... Args>
+shared_function<Ret(Args...)>::shared_function(std::nullptr_t)
+    : shared_function()
 {
 }
 
-template <typename Func>
-auto shared_function<Func>::operator=(std::nullptr_t) -> shared_function&
+template <typename Ret, typename... Args>
+auto shared_function<Ret(Args...)>::operator=(std::nullptr_t)
+    -> shared_function&
 {
   mCall = nullptr;
   return *this;
 }
 
-template <typename Func>
+template <typename Ret, typename... Args>
 template <typename OFunc1, typename, typename>
-shared_function<Func>::shared_function(OFunc1&& call)
-    : mCall(std::make_shared<Func>(std::forward<OFunc1>(call)))
+shared_function<Ret(Args...)>::shared_function(OFunc1&& call)
+    : mCall(std::make_shared<std::function<Ret(Args...)>>(
+          std::forward<OFunc1>(call)))
 {
 }
 
-template <typename Func>
+template <typename Ret, typename... Args>
 template <typename OFunc1, typename, typename>
-shared_function<Func>& shared_function<Func>::operator=(OFunc1&& call)
+shared_function<Ret(Args...)>&
+shared_function<Ret(Args...)>::operator=(OFunc1&& call)
 {
-  mCall = std::make_shared<Func>(std::forward<OFunc1>(call));
+  mCall =
+      std::make_shared<std::function<Ret(Args...)>>(std::forward<OFunc1>(call));
   return *this;
 }
 
-template <typename Func>
-shared_function<Func>::operator bool() const
+template <typename Ret, typename... Args>
+shared_function<Ret(Args...)>::operator bool() const
 {
   return mCall && mCall.get();
 }
 
-template <typename Func>
-template <typename... Args>
-std::result_of_t<Func(Args...)>
-shared_function<Func>::operator()(Args... args) const
+template <typename Ret, typename... Args>
+Ret shared_function<Ret(Args...)>::operator()(Args... args) const
 {
   if (!mCall)
     throw std::bad_function_call();
@@ -114,48 +113,48 @@ shared_function<Func>::operator()(Args... args) const
   return mCall->operator()(std::forward<Args>(args)...);
 }
 
-template <typename Func>
-void shared_function<Func>::swap(shared_function& other)
+template <typename Ret, typename... Args>
+void shared_function<Ret(Args...)>::swap(shared_function& other)
 {
   std::swap(mCall, other.mCall);
 }
 
-template <typename Func>
-const Func& shared_function<Func>::get() const
+template <typename Ret, typename... Args>
+const std::function<Ret(Args...)>& shared_function<Ret(Args...)>::get() const
 {
   return *mCall;
 }
 
-template <typename Func>
-Func& shared_function<Func>::get()
+template <typename Ret, typename... Args>
+std::function<Ret(Args...)>& shared_function<Ret(Args...)>::get()
 {
   return *mCall;
 }
 
-template <typename Func>
-inline bool operator==(const shared_function<Func>& func,
+template <typename Ret, typename... Args>
+inline bool operator==(const shared_function<Ret(Args...)>& func,
                        std::nullptr_t) noexcept
 {
   return !static_cast<bool>(func);
 }
 
-template <typename Func>
+template <typename Ret, typename... Args>
 inline bool operator==(std::nullptr_t,
-                       const shared_function<Func>& func) noexcept
+                       const shared_function<Ret(Args...)>& func) noexcept
 {
   return !static_cast<bool>(func);
 }
 
-template <typename Func>
-inline bool operator!=(const shared_function<Func>& func,
+template <typename Ret, typename... Args>
+inline bool operator!=(const shared_function<Ret(Args...)>& func,
                        std::nullptr_t) noexcept
 {
   return static_cast<bool>(func);
 }
 
-template <typename Func>
+template <typename Ret, typename... Args>
 inline bool operator!=(std::nullptr_t,
-                       const shared_function<Func>& func) noexcept
+                       const shared_function<Ret(Args...)>& func) noexcept
 {
   return static_cast<bool>(func);
 }
@@ -164,8 +163,9 @@ namespace swap_ns
 {
 
 using std::swap;
-template <typename Func>
-inline void swap(shared_function<Func>& l, shared_function<Func>& r)
+template <typename Ret, typename... Args>
+inline void swap(shared_function<Ret(Args...)>& l,
+                 shared_function<Ret(Args...)>& r)
 {
   l.swap(r);
 }
